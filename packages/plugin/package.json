@@ -29,7 +29,7 @@
     }
   },
   "devDependencies": {
-    "@opentui/core": "0.0.0-20260318-24c1a020",
+    "@opentui/core": "0.0.0-20260318-39211c40",
     "@tsconfig/node22": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",

@@ -1,7 +1,6 @@
 /** @jsxImportSource @opentui/solid */
-import { extend, useKeyboard, useTerminalDimensions, type RenderableConstructor } from "@opentui/solid"
-import { RGBA, VignetteEffect, type OptimizedBuffer, type RenderContext } from "@opentui/core"
-import { ThreeRenderable, THREE } from "@opentui/core/3d"
+import { useKeyboard, useTerminalDimensions } from "@opentui/solid"
+import { RGBA, VignetteEffect } from "@opentui/core"
 import type { TuiApi, TuiKeybindSet, TuiPluginInit, TuiPluginInput } from "@opencode-ai/plugin/tui"
 
 const tabs = ["overview", "counter", "help"]
@@ -116,112 +115,6 @@ type Skin = {
   accent: Color
   selected: Color
 }
-type CubeOpts = ConstructorParameters<typeof ThreeRenderable>[1] & {
-  tint?: Color
-  spec?: Color
-  ambient?: Color
-  key_light?: Color
-  fill_light?: Color
-}
-
-const rgb = (value: unknown, fallback: string) => {
-  if (typeof value === "string") return new THREE.Color(value)
-  if (value && typeof value === "object") {
-    const item = value as { r?: unknown; g?: unknown; b?: unknown }
-    if (typeof item.r === "number" && typeof item.g === "number" && typeof item.b === "number") {
-      return new THREE.Color(item.r, item.g, item.b)
-    }
-  }
-  return new THREE.Color(fallback)
-}
-
-class Cube extends ThreeRenderable {
-  private cube: THREE.Mesh
-  private mat: THREE.MeshPhongMaterial
-  private amb: THREE.AmbientLight
-  private key: THREE.DirectionalLight
-  private fill: THREE.DirectionalLight
-
-  constructor(ctx: RenderContext, opts: CubeOpts) {
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100)
-    camera.position.set(0, 0, 2.55)
-
-    const amb = new THREE.AmbientLight(rgb(opts.ambient, "#666666"), 1.0)
-    scene.add(amb)
-
-    const key = new THREE.DirectionalLight(rgb(opts.key_light, "#fff2e6"), 1.2)
-    key.position.set(2.5, 2.0, 3.0)
-    scene.add(key)
-
-    const fill = new THREE.DirectionalLight(rgb(opts.fill_light, "#80b3ff"), 0.6)
-    fill.position.set(-2.0, -1.5, 2.5)
-    scene.add(fill)
-
-    const geo = new THREE.BoxGeometry(1.0, 1.0, 1.0)
-    const mat = new THREE.MeshPhongMaterial({
-      color: rgb(opts.tint, "#40ccff"),
-      shininess: 80,
-      specular: rgb(opts.spec, "#e6e6ff"),
-    })
-    const cube = new THREE.Mesh(geo, mat)
-    cube.scale.setScalar(1.12)
-    scene.add(cube)
-
-    super(ctx, {
-      ...opts,
-      scene,
-      camera,
-      renderer: {
-        focalLength: 8,
-        alpha: true,
-        backgroundColor: RGBA.fromValues(0, 0, 0, 0),
-      },
-    })
-
-    this.cube = cube
-    this.mat = mat
-    this.amb = amb
-    this.key = key
-    this.fill = fill
-  }
-
-  set tint(value: Color | undefined) {
-    this.mat.color.copy(rgb(value, "#40ccff"))
-  }
-
-  set spec(value: Color | undefined) {
-    this.mat.specular.copy(rgb(value, "#e6e6ff"))
-  }
-
-  set ambient(value: Color | undefined) {
-    this.amb.color.copy(rgb(value, "#666666"))
-  }
-
-  set key_light(value: Color | undefined) {
-    this.key.color.copy(rgb(value, "#fff2e6"))
-  }
-
-  set fill_light(value: Color | undefined) {
-    this.fill.color.copy(rgb(value, "#80b3ff"))
-  }
-
-  protected override renderSelf(buf: OptimizedBuffer, dt: number): void {
-    const delta = dt / 1000
-    this.cube.rotation.x += delta * 0.6
-    this.cube.rotation.y += delta * 0.4
-    this.cube.rotation.z += delta * 0.2
-    super.renderSelf(buf, dt)
-  }
-}
-
-declare module "@opentui/solid" {
-  interface OpenTUIComponents {
-    smoke_cube: RenderableConstructor
-  }
-}
-
-extend({ smoke_cube: Cube as unknown as RenderableConstructor })
 
 const Btn = (props: { txt: string; run: () => void; skin: Skin; on?: boolean }) => {
   return (
@@ -755,16 +648,23 @@ const slot = (input: Cfg) => ({
       }
 
       return (
-        <smoke_cube
-          id={`smoke-cube-${value.session_id.slice(0, 8)}`}
-          width="100%"
-          height={16}
-          tint={get("primary", ui.accent)}
-          spec={get("text", ui.text)}
-          ambient={get("textMuted", ui.muted)}
-          key_light={get("success", ui.accent)}
-          fill_light={get("info", ui.accent)}
-        />
+        <box
+          border
+          borderColor={get("border", ui.border)}
+          backgroundColor={get("backgroundPanel", ui.panel)}
+          paddingTop={1}
+          paddingBottom={1}
+          paddingLeft={2}
+          paddingRight={2}
+          flexDirection="column"
+          gap={1}
+        >
+          <text fg={get("primary", ui.accent)}>
+            <b>{input.label}</b>
+          </text>
+          <text fg={get("text", ui.text)}>sidebar slot active</text>
+          <text fg={get("textMuted", ui.muted)}>session {value.session_id.slice(0, 8)}</text>
+        </box>
       )
     },
   },
