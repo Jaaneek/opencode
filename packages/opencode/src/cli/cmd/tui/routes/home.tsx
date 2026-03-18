@@ -1,4 +1,3 @@
-import "@opentui/solid/runtime-plugin-support"
 import { Prompt, type PromptRef } from "@tui/component/prompt"
 import { createEffect, createMemo, Match, on, onMount, Show, Switch } from "solid-js"
 import { useTheme } from "@tui/context/theme"

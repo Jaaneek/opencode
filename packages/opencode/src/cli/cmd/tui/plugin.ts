@@ -1,3 +1,4 @@
+import "@opentui/solid/runtime-plugin-support"
 import {
   type TuiPlugin as TuiPluginFn,
   type TuiPluginInit,
