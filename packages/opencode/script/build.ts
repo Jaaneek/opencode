@@ -59,7 +59,7 @@ console.log(`Loaded ${migrations.length} migrations`)
 const singleFlag = process.argv.includes("--single")
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
-const plugin = createSolidTransformPlugin({ mode: "build" })
+const plugin = createSolidTransformPlugin()
 
 const allTargets: {
   os: string
