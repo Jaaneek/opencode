@@ -40,6 +40,12 @@ export type Config = Omit<SDKConfig, "plugin"> & {
 
 export type Plugin = (input: PluginInput, options?: PluginOptions) => Promise<Hooks>
 
+type Rule = {
+  key: string
+  op: "eq" | "neq"
+  value: string
+}
+
 export type AuthHook = {
   provider: string
   loader?: (auth: () => Promise<Auth>, provider: Provider) => Promise<Record<string, any>>
